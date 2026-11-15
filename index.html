@@ -2,7 +2,13 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Aves Voladoras Iván">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#050814">
+<link rel="manifest" href="manifest.json">
 <title>SDA Animales Arcade - CEIP Muelle del Tinto (Iván Cañadilla Méndez)</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Righteous&display=swap" rel="stylesheet">
 <style>
@@ -16,14 +22,18 @@
     --gold: #f59e0b;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
-  body {
+  html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
     font-family: 'Fredoka', sans-serif;
     background: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #050814 100%);
     color: #fff;
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
-    overflow-x: hidden;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   @keyframes neonPulse {
@@ -167,7 +177,29 @@
   @media (max-width: 680px) {
     .games-grid {
       grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 4px;
     }
+    .menu-card { padding: 10px 8px; border-radius: 16px; }
+    .art-thumb { width: 78px; height: 78px; }
+    .menu-card h3 { font-size: 0.92rem; }
+    header { padding: 6px 8px; gap: 6px; }
+    .btn-pill { padding: 6px 10px; font-size: 0.78rem; }
+    .stage-box { padding: 10px; border-radius: 16px; }
+    .stage-title { font-size: 1.12rem; }
+    .drawing-frame { width: 105px; height: 105px; }
+    .animal-name { font-size: 1.05rem; }
+    .word-btn { font-size: 1.3rem; padding: 12px 8px; }
+    .syl-slot { width: 72px; height: 62px; font-size: 1.6rem; }
+    .syl-tile { font-size: 1.5rem; padding: 10px 18px; }
+    .wheel-container { width: 220px; height: 220px; }
+    .dpad-btn { width: 64px; height: 52px; font-size: 1.5rem; }
+  }
+  @media (min-width: 1440px) {
+    main { max-width: 1560px; }
+    .games-grid { max-width: 1480px; gap: 22px; }
+    .art-thumb { width: 130px; height: 130px; }
+    .menu-card h3 { font-size: 1.28rem; }
   }
   .menu-card {
     background: rgba(25, 36, 68, 0.9);
@@ -229,8 +261,7 @@
   .pdi-canvas {
     width: 100%;
     max-width: 1280px;
-    height: 52vh;
-    min-height: 330px;
+    height: clamp(230px, 48dvh, 520px);
     background: #050814;
     border: 4px solid #f59e0b;
     border-radius: 20px;
@@ -348,6 +379,14 @@
     border-radius: 16px;
     cursor: pointer;
     box-shadow: 0 5px 0 #92400e;
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  }
+  .syl-tile.wrong {
+    animation: shake 0.4s;
+    background: linear-gradient(180deg, #ef4444, #b91c1c) !important;
+    border-color: #fca5a5 !important;
+    box-shadow: 0 5px 0 #7f1d1d !important;
+    color: #fff !important;
   }
 
   .overlay-modal {
@@ -486,7 +525,7 @@
         <div class="wheel-pointer"></div>
         <canvas id="wheelCanvas" class="wheel-canvas" width="280" height="280"></canvas>
       </div>
-      <div style="flex:1; min-width:450px; display:flex; flex-direction:column; gap:8px;">
+      <div style="flex:1; min-width:min(100%, 310px); width:100%; display:flex; flex-direction:column; gap:8px;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
           <p style="font-size:0.95rem; color:#fde047; font-weight:700; text-align:left;">✨ Participantes (🌟 = Pendiente / ⚫ = Ya salió):</p>
           <div id="custom-roster-editor" style="display:none; gap:6px;">
@@ -582,6 +621,7 @@
       <span>EN PIZARRA</span>
       <strong id="active-student-label">Iván</strong>
     </div>
+    <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
     <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
   </div>
 </header>
@@ -1183,9 +1223,28 @@ function changeVoiceMode(mode) {
   speakSequential(labels[mode] || "Voz cambiada.");
 }
 
+let activeSpeechToken = 0;
+let currentGameSession = 0;
+let isGameEnded = false;
+
+function cancelAllSpeech() {
+  activeSpeechToken++;
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
 function speakSequential(txt, callbackAfter) {
+  const myToken = ++activeSpeechToken;
+  const sessionAtStart = currentGameSession;
   if (!("speechSynthesis" in window)) {
-    if (callbackAfter) setTimeout(callbackAfter, 900);
+    if (callbackAfter) {
+      setTimeout(() => {
+        if (myToken === activeSpeechToken && sessionAtStart === currentGameSession && !isGameEnded) {
+          callbackAfter();
+        }
+      }, 900);
+    }
     return;
   }
   window.speechSynthesis.cancel();
@@ -1195,25 +1254,26 @@ function speakSequential(txt, callbackAfter) {
   const naturalVoices = voices.filter(v => /natural|google|online|neural|premium|enhanced|monica|mónica|jorge|pablo|helena|laura|raul|raúl|carlos|alvaro|álvaro|diego|antonio|manuel|enrique/i.test(v.name));
   const pool = naturalVoices.length > 0 ? naturalVoices : voices;
 
-  const maleVoice = pool.find(v => /jorge|pablo|raul|raúl|carlos|alvaro|álvaro|diego|antonio|manuel|enrique|male|hombre/i.test(v.name));
-  const femaleVoices = pool.filter(v => !/jorge|pablo|raul|raúl|carlos|alvaro|álvaro|diego|antonio|manuel|enrique|male|hombre/i.test(v.name));
+  const maleVoice = pool.find(v => /jorge|pablo|raul|raúl|carlos|alvaro|álvaro|diego|antonio|manuel|enrique|tomas|tomás|mateo|male|hombre/i.test(v.name));
+  const clearVoices = pool.filter(v => !/jorge|pablo|raul|raúl|carlos|alvaro|álvaro|diego|antonio|manuel|enrique|tomas|tomás|mateo|male|hombre/i.test(v.name));
+  const baseNatural = clearVoices[0] || pool[0];
 
   let chosenVoice = null;
   if (currentVoiceMode === "voz1") {
-    // Voz 1 (por defecto desde el principio): voz de hombre natural
-    chosenVoice = maleVoice || pool[0];
-    u.pitch = maleVoice ? 0.98 : 0.82;
-    u.rate = 0.96;
+    // Voz 1 (por defecto, juego de Iván): voz masculina natural (o timbre grave natural si el PC solo tiene una voz en español)
+    chosenVoice = maleVoice || baseNatural;
+    u.pitch = maleVoice ? 0.96 : 0.72;
+    u.rate = 0.95;
   } else if (currentVoiceMode === "voz2") {
-    // Voz 2: voz clara y amable
-    chosenVoice = femaleVoices[0] || pool[1 % pool.length] || pool[0];
-    u.pitch = 1.08;
+    // Voz 2: voz clara y cálida (sin alterar timbre)
+    chosenVoice = baseNatural;
+    u.pitch = 1.02;
     u.rate = 0.96;
   } else {
-    // Voz 3: voz más aguda/alegre
-    chosenVoice = femaleVoices[1 % Math.max(1, femaleVoices.length)] || femaleVoices[0] || pool[0];
-    u.pitch = 1.24;
-    u.rate = 0.98;
+    // Voz 3: voz de niño natural y expresiva sin robotizar
+    chosenVoice = clearVoices[1 % Math.max(1, clearVoices.length)] || baseNatural;
+    u.pitch = 1.26;
+    u.rate = 1.0;
   }
   if (chosenVoice) u.voice = chosenVoice;
 
@@ -1221,7 +1281,13 @@ function speakSequential(txt, callbackAfter) {
   const done = () => {
     if (finished) return;
     finished = true;
-    if (callbackAfter) setTimeout(callbackAfter, 450);
+    if (callbackAfter) {
+      setTimeout(() => {
+        if (myToken === activeSpeechToken && sessionAtStart === currentGameSession && !isGameEnded) {
+          callbackAfter();
+        }
+      }, 450);
+    }
   };
   u.onend = done;
   u.onerror = done;
@@ -1320,6 +1386,9 @@ function stopActiveLoops() {
 }
 
 function goHome() {
+  currentGameSession++;
+  isGameEnded = true;
+  cancelAllSpeech();
   stopActiveLoops();
   isGamePaused = false;
   document.getElementById("pause-modal").classList.remove("active");
@@ -1343,6 +1412,9 @@ function promptTimeAndOpen(gameId) {
 }
 
 function confirmStartGame(seconds) {
+  currentGameSession++;
+  isGameEnded = false;
+  cancelAllSpeech();
   document.getElementById("time-modal").classList.remove("active");
   startAmbienceIfNotActive();
   stopActiveLoops();
@@ -1360,8 +1432,6 @@ function confirmStartGame(seconds) {
         updateTimerDisplay();
         if (timeRemaining <= 0) {
           clearInterval(gameTimerInterval);
-          stopActiveLoops();
-          soundBell();
           triggerGameOverModal("⏰ ¡TIEMPO TERMINADO!");
         }
       }
@@ -1388,17 +1458,37 @@ function confirmStartGame(seconds) {
 }
 
 function triggerGameOverModal(customTitle = "⏰ ¡TIEMPO TERMINADO!") {
+  if (isGameEnded) return;
+  isGameEnded = true;
+  currentGameSession++;
+  cancelAllSpeech();
   stopActiveLoops();
   if (gameTimerInterval) clearInterval(gameTimerInterval);
+
+  // Detener música ambiental para que el anuncio de finalización suene totalmente limpio
+  if (ambienceInterval) {
+    clearInterval(ambienceInterval);
+    ambienceInterval = null;
+    const mBtn = document.getElementById("music-btn");
+    if (mBtn) mBtn.innerText = "🐦🎵 Música: OFF";
+  }
+
   const pct = currentTotalInGame > 0 ? Math.round((currentHitsInGame / currentTotalInGame) * 100) : 100;
   document.getElementById("gameover-title").innerText = customTitle;
   document.getElementById("gameover-stats").innerHTML = `
-    🌟 ¡Gran trabajo, <strong>${activeStudent}</strong>!<br>
+    <div style="font-size:1.15rem; color:#fde047; margin-bottom:6px; font-weight:700;">🏁 ¡Se acabó el juego!</div>
+    🌟 ¡Enhorabuena, <strong>${activeStudent}</strong>!<br>
     🎯 Aciertos: ${currentHitsInGame} / ${currentTotalInGame}<br>
     📈 Porcentaje de éxito: <span style="color:#34d399; font-weight:800;">${pct}%</span>
   `;
   document.getElementById("gameover-modal").classList.add("active");
-  speakSequential(`Partida finalizada. Gran trabajo, ${activeStudent}. Has conseguido un ${pct} por ciento de aciertos.`);
+
+  // Esperar 1.1s tras cerrar la actividad para que la campana y la locución de enhorabuena no se entrelacen con ningún sonido previo
+  setTimeout(() => {
+    if (!document.getElementById("gameover-modal").classList.contains("active")) return;
+    soundBell();
+    speakSequential(`¡Se acabó el juego! Enhorabuena ${activeStudent}, has acabado con un ${pct} por ciento de aciertos.`);
+  }, 1100);
 }
 
 function updateTimerDisplay() {
@@ -1514,7 +1604,8 @@ function startGame1(isNextRoute = false) {
     <div class="stage-header">
       <div class="stage-title neon-title">🦉 1. El Búho y su Alimentación (${route.name})</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -1542,15 +1633,17 @@ function startGame1(isNextRoute = false) {
 
   const canvas = document.getElementById("owlCanvas");
   const handleTouch = (e) => {
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     const rect = canvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    owl.targetX = ((clientX - rect.left) / rect.width) * canvas.width;
-    owl.targetY = ((clientY - rect.top) / rect.height) * canvas.height;
+    const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
+    const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+    owl.targetX = Math.max(40, Math.min(canvas.width - 40, ((clientX - rect.left) / rect.width) * canvas.width));
+    owl.targetY = Math.max(40, Math.min(canvas.height - 40, ((clientY - rect.top) / rect.height) * canvas.height));
   };
   canvas.addEventListener("pointerdown", handleTouch);
   canvas.addEventListener("pointermove", (e) => { if (e.buttons === 1) handleTouch(e); });
+  canvas.addEventListener("touchstart", handleTouch, { passive: false });
+  canvas.addEventListener("touchmove", handleTouch, { passive: false });
 
   let routeCleared = false;
   function loopOwl() {
@@ -1646,7 +1739,8 @@ function startGame2(isNextStage = false) {
     <div class="stage-header">
       <div class="stage-title neon-title">🌺 2. Comecocos del Colibrí (¡Huye de los Comecocos!)</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -1683,15 +1777,17 @@ function startGame2(isNextStage = false) {
 
   const canvas = document.getElementById("colibriCanvas");
   const onTouch = (e) => {
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     const rect = canvas.getBoundingClientRect();
-    const cx = e.touches ? e.touches[0].clientX : e.clientX;
-    const cy = e.touches ? e.touches[0].clientY : e.clientY;
-    colibriPac.tx = ((cx - rect.left) / rect.width) * canvas.width;
-    colibriPac.ty = ((cy - rect.top) / rect.height) * canvas.height;
+    const cx = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
+    const cy = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+    colibriPac.tx = Math.max(40, Math.min(canvas.width - 40, ((cx - rect.left) / rect.width) * canvas.width));
+    colibriPac.ty = Math.max(40, Math.min(canvas.height - 40, ((cy - rect.top) / rect.height) * canvas.height));
   };
   canvas.addEventListener("pointerdown", onTouch);
   canvas.addEventListener("pointermove", (e) => { if (e.buttons === 1) onTouch(e); });
+  canvas.addEventListener("touchstart", onTouch, { passive: false });
+  canvas.addEventListener("touchmove", onTouch, { passive: false });
 
   let roundOver = false;
   let mouthAngle = 0;
@@ -1853,7 +1949,8 @@ function startGame3() {
     <div class="stage-header">
       <div class="stage-title neon-title">🦅 3. Águila de las Sumas - Elige Nivel</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -1890,7 +1987,8 @@ function runSumGameLoop() {
     <div class="stage-header">
       <div class="stage-title neon-title">🦅 3. Águila de las Sumas (${sumDifficulty.toUpperCase()})</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -1916,11 +2014,49 @@ function runSumGameLoop() {
   cloudExplosionParticles = [];
 
   const canvas = document.getElementById("eagleCanvas");
-  canvas.addEventListener("pointerdown", (e) => {
+  const handleEagleTap = (e) => {
+    if (e.cancelable) e.preventDefault();
+    if (isGamePaused || roundResolved) return;
     const rect = canvas.getBoundingClientRect();
-    const y = ((e.clientY - rect.top) / rect.height) * canvas.height;
+    const cx = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
+    const cy = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+    const x = ((cx - rect.left) / rect.width) * canvas.width;
+    const y = ((cy - rect.top) / rect.height) * canvas.height;
+
     if (y < 125) eagleLane = 0; else if (y < 235) eagleLane = 1; else eagleLane = 2;
-  });
+
+    // Detectar si tocó directamente una nube flotante
+    clouds.forEach(cl => {
+      if (!cl.exploded && Math.hypot(cl.x - x, cl.y - y) < 75) {
+        eagleLane = cl.lane;
+        if (cl.val === ans) {
+          roundResolved = true;
+          sumsCompletedInSession++;
+          recordResult(true);
+          soundBell();
+          if (sumsCompletedInSession % 3 === 0) {
+            const fact = eagleFactsDeck.next();
+            document.getElementById("eagle-fact-bar").innerHTML = `<span style="font-size:1.15rem; color:#6ee7b7; font-weight:700;">🦅 ${fact}</span>`;
+            speakSequential(`¡Excelente! ${a} más ${b} son ${ans}. ${fact}`, () => {
+              if (document.getElementById("eagleCanvas")) runSumGameLoop();
+            });
+          } else {
+            speakSequential(`¡Excelente! ${a} más ${b} son ${ans}`, () => {
+              if (document.getElementById("eagleCanvas")) runSumGameLoop();
+            });
+          }
+        } else {
+          cl.exploded = true;
+          recordResult(false);
+          soundExplosion();
+          speakSequential(retryMessagesDeck.next());
+          for (let i = 0; i < 16; i++) cloudExplosionParticles.push({ x: cl.x, y: cl.y, vx: (Math.random()-0.5)*7, vy: (Math.random()-0.5)*7, r: Math.random()*9+4 });
+        }
+      }
+    });
+  };
+  canvas.addEventListener("pointerdown", handleEagleTap);
+  canvas.addEventListener("touchstart", handleEagleTap, { passive: false });
 
   let speedFactor = sumDifficulty === "medio" ? 2.1 : 1.45;
   let roundResolved = false;
@@ -2014,7 +2150,8 @@ function startGame4() {
     <div class="stage-header">
       <div class="stage-title neon-title">⚡ 4. Restas con Dibujos del Halcón - Elige Nivel</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -2043,7 +2180,8 @@ function runRestasGameRound() {
     <div class="stage-header">
       <div class="stage-title neon-title">⚡ 4. Restas con Dibujos (${restasLevel.toUpperCase()})</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -2112,7 +2250,8 @@ function startGame5() {
     <div class="stage-header">
       <div class="stage-title neon-title">🪢 5. Reto de Series de Animales Voladores</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -2170,7 +2309,8 @@ function startGame6() {
     <div class="stage-header">
       <div class="stage-title neon-title">🔎 6. Atención Rápida: ${mission.title}</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -2228,7 +2368,8 @@ function startGame7() {
     <div class="stage-header">
       <div class="stage-title neon-title">🏆 7. Gran Trivia de Superpoderes</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -2289,7 +2430,8 @@ function startGame8() {
     <div class="stage-header">
       <div class="stage-title neon-title">🔍 8. El Detective: ¡Encuentra al Intruso!</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -2355,7 +2497,8 @@ function startGame9() {
     <div class="stage-header">
       <div class="stage-title neon-title">📝 9. Taller de Sílabas</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -2382,7 +2525,12 @@ function startGame9() {
           });
         } else { speakSequential(s.toLowerCase()); }
       } else {
-        recordResult(false); t.classList.add("wrong"); setTimeout(() => t.classList.remove("wrong"), 400);
+        recordResult(false);
+        t.classList.remove("wrong");
+        void t.offsetWidth;
+        t.classList.add("wrong");
+        soundExplosion();
+        setTimeout(() => t.classList.remove("wrong"), 650);
       }
     };
     tilesBox.appendChild(t);
@@ -2429,7 +2577,8 @@ function startGame10() {
     <div class="stage-header">
       <div class="stage-title neon-title">📖 10. Asociación Lectora</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -2613,7 +2762,8 @@ function startGame11(isContinue = false) {
     <div class="stage-header">
       <div class="stage-title neon-title">📸 11. Museo Real de Aves (${currentIdx} / ${museumTotalCount})</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -2684,7 +2834,8 @@ function startGame12() {
     <div class="stage-header">
       <div class="stage-title neon-title">☁️ 12. Caza de Nubes: Sumas y Restas Combinadas</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -2716,7 +2867,8 @@ function nextOperation12() {
     <div class="stage-header">
       <div class="stage-title neon-title">☁️ 12. Caza de Nubes (${game12Level.toUpperCase()})</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
+        <button class="btn-pill" style="background:linear-gradient(135deg,#0ea5e9,#2563eb); border:2px solid #bae6fd;" onclick="toggleFullScreenApp()" title="Modo App Pantalla Completa">⛶ App</button>
+    <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
@@ -2745,34 +2897,81 @@ function nextOperation12() {
   }
   const optsArray = Array.from(optsSet).sort(() => Math.random() - 0.5);
 
-  const startY = [100, 200, 310];
+  const startPositions = [
+    { x: 430, y: 110, vx: 0.65, vy: 0.7 },
+    { x: 690, y: 270, vx: -0.6, vy: -0.75 },
+    { x: 920, y: 150, vx: -0.55, vy: 0.65 }
+  ];
   clouds12 = optsArray.map((val, i) => ({
-    x: 450 + (i * 240),
-    y: startY[i],
+    x: startPositions[i].x,
+    y: startPositions[i].y,
     val: val,
-    vy: (i % 2 === 0 ? 0.8 : -0.8),
-    w: 120,
-    h: 70
+    vx: startPositions[i].vx,
+    vy: startPositions[i].vy,
+    exploded: false
   }));
+  let explosionParticles12 = [];
 
-  birdPos12 = { x: 160, y: 200, targetX: 160, targetY: 200 };
+  birdPos12 = { x: 150, y: 200, targetX: 150, targetY: 200 };
+  let roundEnded = false;
+
+  function resolveCloud12(c) {
+    if (c.exploded || roundEnded) return;
+    if (c.val === ans) {
+      roundEnded = true;
+      recordResult(true);
+      soundBell();
+      speakSequential(`¡Genial! El resultado es ${ans}`, () => {
+        if (document.getElementById("cloudsCanvas12")) nextOperation12();
+      });
+    } else {
+      c.exploded = true;
+      recordResult(false);
+      soundExplosion();
+      speakSequential(retryMessagesDeck.next());
+      for (let i = 0; i < 20; i++) {
+        explosionParticles12.push({
+          x: c.x,
+          y: c.y,
+          vx: (Math.random() - 0.5) * 9,
+          vy: (Math.random() - 0.5) * 9,
+          r: Math.random() * 10 + 4
+        });
+      }
+    }
+  }
 
   const canvas = document.getElementById("cloudsCanvas12");
-  const onTouch = (e) => {
-    e.preventDefault();
+  const onTouch = (e, isTap = false) => {
+    if (e.cancelable) e.preventDefault();
+    if (isGamePaused || roundEnded) return;
     const rect = canvas.getBoundingClientRect();
-    const cx = e.touches ? e.touches[0].clientX : e.clientX;
-    const cy = e.touches ? e.touches[0].clientY : e.clientY;
-    birdPos12.targetX = Math.max(40, Math.min(canvas.width - 40, ((cx - rect.left) / rect.width) * canvas.width));
-    birdPos12.targetY = Math.max(40, Math.min(canvas.height - 40, ((cy - rect.top) / rect.height) * canvas.height));
+    const cx = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
+    const cy = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+    const x = Math.max(40, Math.min(canvas.width - 40, ((cx - rect.left) / rect.width) * canvas.width));
+    const y = Math.max(40, Math.min(canvas.height - 40, ((cy - rect.top) / rect.height) * canvas.height));
+
+    birdPos12.targetX = x;
+    birdPos12.targetY = y;
+
+    // Si toca directamente una nube flotante en la PDI o móvil, actuar al instante sobre esa nube
+    if (isTap) {
+      clouds12.forEach(c => {
+        if (!c.exploded && Math.hypot(c.x - x, c.y - y) < 75) {
+          birdPos12.x = c.x;
+          birdPos12.y = c.y;
+          resolveCloud12(c);
+        }
+      });
+    }
   };
 
-  canvas.addEventListener("pointerdown", onTouch);
+  canvas.addEventListener("pointerdown", (e) => onTouch(e, true));
   canvas.addEventListener("pointermove", (e) => {
-    if (e.buttons === 1 || e.touches) onTouch(e);
+    if (e.buttons === 1) onTouch(e, false);
   });
-
-  let roundEnded = false;
+  canvas.addEventListener("touchstart", (e) => onTouch(e, true), { passive: false });
+  canvas.addEventListener("touchmove", (e) => onTouch(e, false), { passive: false });
 
   function loopGame12() {
     if (!document.getElementById("cloudsCanvas12")) return;
@@ -2781,35 +2980,26 @@ function nextOperation12() {
       birdPos12.y += (birdPos12.targetY - birdPos12.y) * 0.18;
 
       clouds12.forEach(c => {
+        if (c.exploded) return;
+        c.x += c.vx;
         c.y += c.vy;
-        if (c.y < 70 || c.y > 330) c.vy *= -1;
+        if (c.x < 280 || c.x > 1010) c.vx *= -1;
+        if (c.y < 65 || c.y > 335) c.vy *= -1;
 
         if (Math.hypot(c.x - birdPos12.x, c.y - birdPos12.y) < 65) {
-          if (c.val === ans) {
-            roundEnded = true;
-            recordResult(true);
-            soundBell();
-            speakSequential(`¡Genial! El resultado es ${ans}`, () => {
-              if (document.getElementById("cloudsCanvas12")) nextOperation12();
-            });
-          } else {
-            recordResult(false);
-            soundExplosion();
-            speakSequential(retryMessagesDeck.next());
-            c.x += 160;
-          }
+          resolveCloud12(c);
         }
       });
     }
 
-    drawScene12();
+    drawScene12(explosionParticles12);
     activeLoopId = requestAnimationFrame(loopGame12);
   }
 
   loopGame12();
 }
 
-function drawScene12() {
+function drawScene12(particles = []) {
   const c = document.getElementById("cloudsCanvas12");
   if (!c) return;
   const ctx = c.getContext("2d");
@@ -2835,9 +3025,10 @@ function drawScene12() {
   ctx.fill();
 
   clouds12.forEach(cl => {
+    if (cl.exploded) return;
     ctx.fillStyle = "#ffffff";
     ctx.beginPath();
-    ctx.ellipse(cl.x, cl.y, 60, 36, 0, 0, Math.PI * 2);
+    ctx.ellipse(cl.x, cl.y, 62, 38, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = "#0284c7";
     ctx.lineWidth = 3;
@@ -2850,6 +3041,16 @@ function drawScene12() {
     ctx.fillText(cl.val, cl.x, cl.y);
   });
 
+  particles.forEach(p => {
+    ctx.fillStyle = "#ef4444";
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+    p.x += p.vx;
+    p.y += p.vy;
+    p.r *= 0.94;
+  });
+
   ctx.save();
   ctx.translate(birdPos12.x, birdPos12.y);
   ctx.font = "62px sans-serif";
@@ -2859,7 +3060,27 @@ function drawScene12() {
   ctx.restore();
 }
 
+
+function toggleFullScreenApp() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+  }
+}
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+
 window.addEventListener("DOMContentLoaded", () => {
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.getVoices();
+  }
+  const vSel = document.getElementById("voice-mode-select");
+  if (vSel) vSel.value = "voz1";
   renderMainMenu();
 });
 </script>

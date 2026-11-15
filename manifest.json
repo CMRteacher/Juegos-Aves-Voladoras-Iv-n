@@ -1,0 +1,19 @@
+{
+  "name": "Exploradores del Cielo - Aves Voladoras (CEIP Muelle del Tinto)",
+  "short_name": "Aves Voladoras",
+  "description": "Suite educativa interactiva de 12 juegos sobre aves voladoras para Infantil 5 Años - Iván Cañadilla Méndez",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#050814",
+  "theme_color": "#050814",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
