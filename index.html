@@ -2687,112 +2687,85 @@ const readDeck = new Deck([
   { ans: "golondrina", opts: ["golondrina", "jilguero", "canario", "colibri"] },
   { ans: "flamenco", opts: ["flamenco", "garza", "ciguena", "cisne"] }
 ]);
-const REAL_ANIMAL_PHOTOS = {
-  ciguena: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/White_Stork_(Ciconia_ciconia)_(1).jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Ciconia_ciconia_01.jpg?width=600"
-  ],
-  cisne: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Cygnus_olor_2_(Marek_Szczepanek).jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Mute_swan_(Cygnus_olor).jpg?width=600"
-  ],
-  pavoreal: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Peacock_Plumage.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Pavo_cristatus_-displaying_train-8.jpg?width=600"
-  ],
-  colibri: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Colibri_thalassinus_-_01.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Archilochus_colubris_-flying-8.jpg?width=600"
-  ],
-  buho: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Bubo_bubo_3_(Martin_Mecnarowski).jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Eurasian_eagle-owl_(Bubo_bubo)_2.jpg?width=600"
-  ],
-  aguila: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Golden_Eagle_in_flight_-_5.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Aquila_chrysaetos_qtl1.jpg?width=600"
-  ],
-  halcon: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Falco_peregrinus_-_01.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Peregrine_falcon_in_flight.jpg?width=600"
-  ],
-  pato: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Anas_platyrhynchos_male_female_quadrat.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Mallard_drake_02.jpg?width=600"
-  ],
-  loro: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Ara_macao_-on_a_branch-8a.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Scarlet_Macaw_(Ara_macao).jpg?width=600"
-  ],
-  tucan: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Ramphastos_sulfuratus_-Belize_Zoo-6a.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Keel-billed_Toucan_(Ramphastos_sulfuratus).jpg?width=600"
-  ],
-  flamenco: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Phoenicopterus_roseus_-_01.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Greater_flamingo_(Phoenicopterus_roseus).jpg?width=600"
-  ],
-  gallina: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Gallus_gallus_domesticus_hen.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Chicken_in_grass.jpg?width=600"
-  ],
-  paloma: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Columba_livia_cropped.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Rock_Pigeon_Columba_livia.jpg?width=600"
-  ],
-  golondrina: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Barn_Swallow_(Hirundo_rustica).jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Hirundo_rustica_2.jpg?width=600"
-  ],
-  pelicano: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Pelecanus_onocrotalus_-_01.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Great_white_pelican_(Pelecanus_onocrotalus).jpg?width=600"
-  ],
-  gaviota: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Larus_michabellis_qtl1.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Yellow-legged_Gull_(Larus_michahellis).jpg?width=600"
-  ],
-  pinguino: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Emperor_Penguin_Manchot_empereur.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Aptenodytes_forsteri_-Snow_Hill_Island,_Antarctica_-adults_and_juvenile-8.jpg?width=600"
-  ],
-  murcielago: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Big-eared-townsend-fledermaus.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Corynorhinus_townsendii.jpg?width=600"
-  ],
-  canario: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Serinus_canaria_-Parque_Rural_del_Nublo,_Gran_Canaria,_Spain-8a.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Domestic_canary_(Serinus_canaria_domestica).jpg?width=600"
-  ],
-  buitre: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Gyps_fulvus_-Spain-8.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Griffon_Vulture_(Gyps_fulvus).jpg?width=600"
-  ],
-  lechuza: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Tyto_alba_-British_Wildlife_Centre,_Surrey,_England-8a_(1).jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Tyto_alba_close_up.jpg?width=600"
-  ],
-  garza: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Ardea_cinerea_Luc_Viatour.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Grey_heron_(Ardea_cinerea).jpg?width=600"
-  ],
-  cuervo: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Corvus_corax_-_01.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Common_raven_(Corvus_corax).jpg?width=600"
-  ],
-  jilguero: [
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Carduelis_carduelis_close_up.jpg?width=600",
-    "https://commons.wikimedia.org/wiki/Special:FilePath/European_goldfinch_(Carduelis_carduelis).jpg?width=600"
-  ]
+const WIKI_ARTICLE_TITLES = {
+  ciguena: ["Ciconia ciconia", "Cigüeña"],
+  cisne: ["Cygnus olor", "Cisne"],
+  pavoreal: ["Pavo cristatus", "Pavo real"],
+  colibri: ["Trochilidae", "Colibrí"],
+  buho: ["Bubo bubo", "Búho real"],
+  aguila: ["Aquila chrysaetos", "Águila real"],
+  halcon: ["Falco peregrinus", "Halcón peregrino"],
+  pato: ["Anas platyrhynchos", "Pato"],
+  loro: ["Ara macao", "Guacamayo"],
+  tucan: ["Ramphastos sulfuratus", "Tucán"],
+  flamenco: ["Phoenicopterus roseus", "Flamenco"],
+  gallina: ["Gallus gallus domesticus", "Gallina"],
+  paloma: ["Columba livia", "Paloma"],
+  golondrina: ["Hirundo rustica", "Golondrina"],
+  pelicano: ["Pelecanus onocrotalus", "Pelícano"],
+  gaviota: ["Larus michahellis", "Gaviota"],
+  pinguino: ["Aptenodytes forsteri", "Pingüino"],
+  murcielago: ["Chiroptera", "Murciélago"],
+  canario: ["Serinus canaria", "Canario"],
+  buitre: ["Gyps fulvus", "Buitre leonado"],
+  lechuza: ["Tyto alba", "Lechuza común"],
+  garza: ["Ardea cinerea", "Garza real"],
+  cuervo: ["Corvus corax", "Cuervo"],
+  jilguero: ["Carduelis carduelis", "Jilguero"]
 };
 
-function getRealAnimalPhotoHTML(key) {
-  const list = REAL_ANIMAL_PHOTOS[key];
-  if (!list || list.length === 0) return getAnimalDrawing(key);
-  const p1 = list[0];
-  const p2 = list[1] || "";
-  const altName = ANIMALS[key] ? ANIMALS[key].name : key;
-  return `<img src="${p1}" referrerpolicy="no-referrer" alt="${altName}" style="width:100%; height:100%; object-fit:cover;" onerror="handleMuseumImgError(this, '${p2}', '${key}')">`;
+const WIKI_PHOTO_CACHE = {};
+
+async function loadRealWikiPhotoInto(imgId, animalKey) {
+  const imgEl = document.getElementById(imgId);
+  if (!imgEl) return;
+
+  if (WIKI_PHOTO_CACHE[animalKey]) {
+    imgEl.src = WIKI_PHOTO_CACHE[animalKey];
+    imgEl.style.display = "block";
+    const fb = document.getElementById(imgId + "-fallback");
+    if (fb) fb.style.display = "none";
+    return;
+  }
+
+  const titles = WIKI_ARTICLE_TITLES[animalKey] || [animalKey];
+  for (const title of titles) {
+    try {
+      const apiUrl = `https://es.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&format=json&pithumbsize=640&origin=*`;
+      const resp = await fetch(apiUrl);
+      if (!resp.ok) continue;
+      const data = await resp.json();
+      const pages = data && data.query && data.query.pages;
+      if (!pages) continue;
+      const pageId = Object.keys(pages)[0];
+      const thumb = pages[pageId] && pages[pageId].thumbnail && pages[pageId].thumbnail.source;
+      if (thumb) {
+        WIKI_PHOTO_CACHE[animalKey] = thumb;
+        const currentImg = document.getElementById(imgId);
+        if (currentImg) {
+          currentImg.src = thumb;
+          currentImg.style.display = "block";
+          const fb = document.getElementById(imgId + "-fallback");
+          if (fb) fb.style.display = "none";
+        }
+        return;
+      }
+    } catch (e) {}
+  }
+}
+
+function createRealPhotoContainerHTML(animalKey, sizePx = 190) {
+  const uid = "real-photo-" + animalKey + "-" + Math.floor(Math.random() * 100000);
+  setTimeout(() => loadRealWikiPhotoInto(uid, animalKey), 10);
+  return `
+    <div style="width:${sizePx}px; height:${sizePx}px; border-radius:22px; border:4px solid #f59e0b; overflow:hidden; box-shadow:0 0 22px rgba(245,158,11,0.38); background:#0f172a; position:relative; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+      <img id="${uid}" alt="${animalKey}" style="width:100%; height:100%; object-fit:cover; display:none;" onerror="this.style.display='none'; document.getElementById('${uid}-fallback').style.display='flex';">
+      <div id="${uid}-fallback" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fde047; font-size:0.9rem; gap:6px;">
+        <span style="font-size:2.2rem;">📸</span>
+        <span>Cargando foto real...</span>
+      </div>
+    </div>
+  `;
 }
 
 function startGame10() {
@@ -2800,31 +2773,46 @@ function startGame10() {
   const animalObj = ANIMALS[item.ans];
   const box = document.getElementById("stage-content");
   let locked = false;
+  const clueText = animalObj.clue;
+
   box.innerHTML = `
     <div class="stage-header">
       <div class="stage-title neon-title">📖 10. Asociación Foto Real y Palabra</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn-pill btn-scores" onclick="speakSequential('${animalObj.clue.replace(/'/g, "")}')">🔊 Escuchar</button>
+        <button id="btn-read-clue-10" class="btn-pill btn-scores">🔊 Leer Definición</button>
         <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
-    <div class="drawing-frame" style="width:185px; height:185px; border-width:4px; border-color:#f59e0b; box-shadow:0 0 20px rgba(245,158,11,0.35);">${getRealAnimalPhotoHTML(item.ans)}</div>
-    <p style="font-size:1.15rem; color:#fde047; font-weight:700; margin: 4px 0 6px; text-align:center; max-width:920px;">${animalObj.clue}</p>
+    ${createRealPhotoContainerHTML(item.ans, 185)}
+    <p style="font-size:1.2rem; color:#fde047; font-weight:700; margin: 6px 0 8px; text-align:center; max-width:940px; line-height:1.35;">${clueText}</p>
     <div class="word-grid" id="read10-grid"></div>
   `;
-  speakSequential(`${animalObj.clue}. Toca su palabra.`);
+
+  document.getElementById("btn-read-clue-10").onclick = () => {
+    speakSequential(`${clueText}. Toca su palabra.`);
+  };
+
+  // Pequeño retardo de 250ms tras pintar el DOM para garantizar que el navegador inicie la locución limpia de la definición
+  setTimeout(() => {
+    if (document.getElementById("read10-grid")) {
+      speakSequential(`${clueText}. Toca su palabra.`);
+    }
+  }, 250);
 
   const grid = document.getElementById("read10-grid");
   [...item.opts].sort(() => Math.random() - 0.5).forEach(k => {
     const w = ANIMALS[k].name;
     const btn = document.createElement("button");
-    btn.className = "word-btn"; btn.innerHTML = `${w}<small>${w.toLowerCase()}</small>`;
+    btn.className = "word-btn";
+    btn.innerHTML = `${w}<small>${w.toLowerCase()}</small>`;
     btn.onclick = () => {
       if (locked) return;
       if (k === item.ans) {
-        locked = true; recordResult(true); soundBell();
-        speakSequential(`¡Muy bien! ${w}`, () => {
+        locked = true;
+        recordResult(true);
+        soundBell();
+        speakSequential(`¡Muy bien! Es ${w}`, () => {
           if (document.getElementById("read10-grid")) startGame10();
         });
       } else {
@@ -2838,114 +2826,66 @@ function startGame10() {
   });
 }
 
-// JUEGO 11: MUSEO REAL
+// JUEGO 11: MUSEO REAL DE DATOS CURIOSOS DE AVES (FOTOS REALES WIKIPEDIA)
 const REAL_MUSEUM_ITEMS = [
   {
     name: "BÚHO REAL",
     key: "buho",
-    photos: [
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Bubo_bubo_3_(Martin_Mecnarowski).jpg?width=640",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Eurasian_eagle-owl_(Bubo_bubo)_2.jpg?width=640"
-    ],
     fact: "El búho real es una de las aves rapaces nocturnas más grandes del mundo. Sus ojos no pueden moverse dentro de la cuenca, por lo que para mirar a un lado necesita girar la cabeza entera ¡hasta 270 grados!"
   },
   {
     name: "ÁGUILA REAL",
     key: "aguila",
-    photos: [
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Golden_Eagle_in_flight_-_5.jpg?width=640",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Aquila_chrysaetos_qtl1.jpg?width=640"
-    ],
     fact: "El águila real posee una supervista telescópica capaz de divisar una pequeña liebre a más de un kilómetro de altura mientras vuela planeando por las altas montañas."
   },
   {
     name: "HALCÓN PEREGRINO",
     key: "halcon",
-    photos: [
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Falco_peregrinus_-_01.jpg?width=640",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Peregrine_falcon_in_flight.jpg?width=640"
-    ],
     fact: "El halcón peregrino es el animal más rápido de todo el planeta Tierra. Cuando se lanza en picado para cazar en el aire, puede superar los 300 kilómetros por hora."
   },
   {
     name: "COLIBRÍ ESMERALDA",
     key: "colibri",
-    photos: [
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Colibri_thalassinus_-_01.jpg?width=640",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Archilochus_colubris_-flying-8.jpg?width=640"
-    ],
     fact: "El colibrí es tan diminuto que cabe en la palma de la mano. Es la única ave capaz de volar hacia atrás y sus alas se mueven tan rápido que parecen invisibles."
   },
   {
     name: "CIGÜEÑA BLANCA",
     key: "ciguena",
-    photos: [
-      "https://commons.wikimedia.org/wiki/Special:FilePath/White_Stork_(Ciconia_ciconia)_(1).jpg?width=640",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Ciconia_ciconia_01.jpg?width=640"
-    ],
     fact: "La cigüeña blanca es un ave migratoria que recorre desiertos y mares cada año volando desde Europa hasta África para pasar el invierno en lugares cálidos."
   },
   {
     name: "LECHUZA COMÚN",
     key: "lechuza",
-    photos: [
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Tyto_alba_-British_Wildlife_Centre,_Surrey,_England-8a_(1).jpg?width=640",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Tyto_alba_close_up.jpg?width=640"
-    ],
     fact: "La lechuza blanca tiene una cara en forma de corazón que funciona como una antena parabólica para recoger hasta el más mínimo sonido de un ratón en la oscuridad."
   },
   {
     name: "PAVO REAL",
     key: "pavoreal",
-    photos: [
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Peacock_Plumage.jpg?width=640",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Pavo_cristatus_-displaying_train-8.jpg?width=640"
-    ],
     fact: "La espectacular cola en abanico del pavo real puede tener más de ciento cincuenta plumas largas decoradas con dibujos brillantes que parecen ojos."
   },
   {
     name: "FLAMENCO ROSA",
     key: "flamenco",
-    photos: [
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Phoenicopterus_roseus_-_01.jpg?width=640",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Greater_flamingo_(Phoenicopterus_roseus).jpg?width=640"
-    ],
     fact: "Los flamencos nacen con plumas de color gris o blanco y se vuelven de color rosa brillante gracias a los pequeños camarones y algas que comen en las marismas."
   },
   {
     name: "TUCÁN TROPICAL",
     key: "tucan",
-    photos: [
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Ramphastos_sulfuratus_-Belize_Zoo-6a.jpg?width=640",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Keel-billed_Toucan_(Ramphastos_sulfuratus).jpg?width=640"
-    ],
     fact: "Aunque su enorme pico parece muy pesado, por dentro es hueco y esponjoso como una pluma, lo que le permite alcanzar frutas en las ramas más finas sin perder el equilibrio."
   },
   {
     name: "PELÍCANO BLANCO",
     key: "pelicano",
-    photos: [
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Pelecanus_onocrotalus_-_01.jpg?width=640",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Great_white_pelican_(Pelecanus_onocrotalus).jpg?width=640"
-    ],
     fact: "El pelícano tiene una enorme bolsa elástica debajo de su largo pico que utiliza como una red de pesca para atrapar peces en el agua."
   },
   {
     name: "GUACAMAYO ROJO (LORO)",
     key: "loro",
-    photos: [
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Ara_macao_-on_a_branch-8a.jpg?width=640",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Scarlet_Macaw_(Ara_macao).jpg?width=640"
-    ],
     fact: "Los guacamayos y loros son aves muy inteligentes y sociables que viven en bandadas en la selva y tienen un pico curvo muy fuerte para abrir nueces y semillas."
   },
   {
     name: "CISNE BLANCO",
     key: "cisne",
-    photos: [
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Cygnus_olor_2_(Marek_Szczepanek).jpg?width=640",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Mute_swan_(Cygnus_olor).jpg?width=640"
-    ],
     fact: "El cisne blanco es una de las aves voladoras más pesadas y elegantes; necesita correr sobre la superficie del agua batiendo sus grandes alas para poder despegar."
   }
 ];
@@ -2958,16 +2898,6 @@ function initMuseumSession() {
   for (let i = museumQueue.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [museumQueue[i], museumQueue[j]] = [museumQueue[j], museumQueue[i]];
-  }
-}
-
-function handleMuseumImgError(imgEl, backupUrl, animalKey) {
-  if (backupUrl && imgEl.dataset.triedBackup !== "1") {
-    imgEl.dataset.triedBackup = "1";
-    imgEl.src = backupUrl;
-  } else {
-    imgEl.style.display = "none";
-    imgEl.parentElement.innerHTML = getAnimalDrawing(animalKey);
   }
 }
 
@@ -2984,8 +2914,6 @@ function startGame11(isContinue = false) {
   const currentIdx = museumTotalCount - museumQueue.length + 1;
   const item = museumQueue.pop();
   const isLast = museumQueue.length === 0;
-  const primaryPhoto = item.photos[0];
-  const backupPhoto = item.photos[1] || "";
 
   const box = document.getElementById("stage-content");
   box.innerHTML = `
@@ -2997,16 +2925,14 @@ function startGame11(isContinue = false) {
       </div>
     </div>
     <div style="display:flex; gap:25px; align-items:center; flex-wrap:wrap; justify-content:center; max-width:1050px; margin:auto;">
-      <div id="museum-photo-box" style="width:290px; height:290px; border-radius:24px; border:4px solid #f59e0b; overflow:hidden; box-shadow:0 0 25px rgba(245,158,11,0.4); background:#0f172a; display:flex; align-items:center; justify-content:center;">
-        <img src="${primaryPhoto}" referrerpolicy="no-referrer" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;" onerror="handleMuseumImgError(this, '${backupPhoto}', '${item.key}')">
-      </div>
+      ${createRealPhotoContainerHTML(item.key, 270)}
       <div style="flex:1; min-width:300px; display:flex; flex-direction:column; gap:12px; text-align:left;">
         <h2 class="neon-title" style="font-size:2rem; color:#fde047;">${item.name}</h2>
         <p style="font-size:1.2rem; color:#e2e8f0; line-height:1.5; background:rgba(255,255,255,0.06); padding:14px; border-radius:18px; border:2px solid rgba(56,189,248,0.3);">
           ${item.fact}
         </p>
         <div style="display:flex; gap:12px; flex-wrap:wrap;">
-          <button class="btn-pill btn-scores" style="font-size:1.1rem; padding:10px 22px;" onclick="speakSequential('${item.fact.replace(/'/g, "")}')">🔊 Escuchar Dato</button>
+          <button id="btn-museum-listen" class="btn-pill btn-scores" style="font-size:1.1rem; padding:10px 22px;">🔊 Escuchar Dato</button>
           <button class="btn-pill btn-roulette" style="font-size:1.1rem; padding:10px 22px;" onclick="recordResult(true); soundBell(); startGame11(true);">
             ${isLast ? "🏁 Finalizar Museo Real" : "✨ Siguiente Ave Real"}
           </button>
@@ -3014,7 +2940,16 @@ function startGame11(isContinue = false) {
       </div>
     </div>
   `;
-  speakSequential(`Fotografía real de ${item.name}. ${item.fact}`);
+
+  document.getElementById("btn-museum-listen").onclick = () => {
+    speakSequential(`${item.name}. ${item.fact}`);
+  };
+
+  setTimeout(() => {
+    if (document.getElementById("btn-museum-listen")) {
+      speakSequential(`Fotografía real de ${item.name}. ${item.fact}`);
+    }
+  }, 250);
 }
 
 // ============================================================================
