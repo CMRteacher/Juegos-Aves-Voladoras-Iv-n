@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aves-voladoras-pwa-v11';
+const CACHE_NAME = 'aves-voladoras-pwa-v12';
 const ASSETS = [
   './',
   './index.html',

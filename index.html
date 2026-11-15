@@ -2688,30 +2688,30 @@ const readDeck = new Deck([
   { ans: "flamenco", opts: ["flamenco", "garza", "ciguena", "cisne"] }
 ]);
 const WIKI_ARTICLE_TITLES = {
-  ciguena: ["Ciconia ciconia", "Cigüeña"],
-  cisne: ["Cygnus olor", "Cisne"],
-  pavoreal: ["Pavo cristatus", "Pavo real"],
-  colibri: ["Trochilidae", "Colibrí"],
-  buho: ["Bubo bubo", "Búho real"],
-  aguila: ["Aquila chrysaetos", "Águila real"],
-  halcon: ["Falco peregrinus", "Halcón peregrino"],
-  pato: ["Anas platyrhynchos", "Pato"],
-  loro: ["Ara macao", "Guacamayo"],
-  tucan: ["Ramphastos sulfuratus", "Tucán"],
-  flamenco: ["Phoenicopterus roseus", "Flamenco"],
-  gallina: ["Gallus gallus domesticus", "Gallina"],
-  paloma: ["Columba livia", "Paloma"],
-  golondrina: ["Hirundo rustica", "Golondrina"],
-  pelicano: ["Pelecanus onocrotalus", "Pelícano"],
-  gaviota: ["Larus michahellis", "Gaviota"],
-  pinguino: ["Aptenodytes forsteri", "Pingüino"],
-  murcielago: ["Chiroptera", "Murciélago"],
-  canario: ["Serinus canaria", "Canario"],
-  buitre: ["Gyps fulvus", "Buitre leonado"],
-  lechuza: ["Tyto alba", "Lechuza común"],
-  garza: ["Ardea cinerea", "Garza real"],
-  cuervo: ["Corvus corax", "Cuervo"],
-  jilguero: ["Carduelis carduelis", "Jilguero"]
+  ciguena: ["Ciconia ciconia", "White Stork"],
+  cisne: ["Cygnus olor", "Mute swan"],
+  pavoreal: ["Pavo cristatus", "Indian peafowl"],
+  colibri: ["Archilochus colubris", "Trochilidae", "Hummingbird"],
+  buho: ["Bubo bubo", "Eurasian eagle-owl"],
+  aguila: ["Aquila chrysaetos", "Golden eagle"],
+  halcon: ["Falco peregrinus", "Peregrine falcon"],
+  pato: ["Anas platyrhynchos", "Mallard"],
+  loro: ["Ara macao", "Scarlet macaw"],
+  tucan: ["Ramphastos toco", "Toco toucan", "Ramphastidae"],
+  flamenco: ["Phoenicopterus roseus", "Greater flamingo"],
+  gallina: ["Gallus gallus domesticus", "Chicken"],
+  paloma: ["Columba livia", "Rock dove"],
+  golondrina: ["Hirundo rustica", "Barn swallow"],
+  pelicano: ["Pelecanus onocrotalus", "Great white pelican"],
+  gaviota: ["Larus michahellis", "Yellow-legged gull"],
+  pinguino: ["Aptenodytes forsteri", "Emperor penguin"],
+  murcielago: ["Plecotus auritus", "Chiroptera", "Bat"],
+  canario: ["Serinus canaria", "Domestic canary"],
+  buitre: ["Gyps fulvus", "Griffon vulture"],
+  lechuza: ["Tyto alba", "Barn owl"],
+  garza: ["Ardea cinerea", "Grey heron"],
+  cuervo: ["Corvus corax", "Common raven"],
+  jilguero: ["Carduelis carduelis", "European goldfinch"]
 };
 
 const WIKI_PHOTO_CACHE = {};
@@ -2729,39 +2729,42 @@ async function loadRealWikiPhotoInto(imgId, animalKey) {
   }
 
   const titles = WIKI_ARTICLE_TITLES[animalKey] || [animalKey];
-  for (const title of titles) {
-    try {
-      const apiUrl = `https://es.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&format=json&pithumbsize=640&origin=*`;
-      const resp = await fetch(apiUrl);
-      if (!resp.ok) continue;
-      const data = await resp.json();
-      const pages = data && data.query && data.query.pages;
-      if (!pages) continue;
-      const pageId = Object.keys(pages)[0];
-      const thumb = pages[pageId] && pages[pageId].thumbnail && pages[pageId].thumbnail.source;
-      if (thumb) {
-        WIKI_PHOTO_CACHE[animalKey] = thumb;
-        const currentImg = document.getElementById(imgId);
-        if (currentImg) {
-          currentImg.src = thumb;
-          currentImg.style.display = "block";
-          const fb = document.getElementById(imgId + "-fallback");
-          if (fb) fb.style.display = "none";
+  const langs = ["es", "en"];
+  for (const lang of langs) {
+    for (const title of titles) {
+      try {
+        const apiUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&format=json&pithumbsize=800&origin=*`;
+        const resp = await fetch(apiUrl);
+        if (!resp.ok) continue;
+        const data = await resp.json();
+        const pages = data && data.query && data.query.pages;
+        if (!pages) continue;
+        const pageId = Object.keys(pages)[0];
+        const thumb = pages[pageId] && pages[pageId].thumbnail && pages[pageId].thumbnail.source;
+        if (thumb && !/\.svg|map|range|distribution|locator|status/i.test(thumb)) {
+          WIKI_PHOTO_CACHE[animalKey] = thumb;
+          const currentImg = document.getElementById(imgId);
+          if (currentImg) {
+            currentImg.src = thumb;
+            currentImg.style.display = "block";
+            const fb = document.getElementById(imgId + "-fallback");
+            if (fb) fb.style.display = "none";
+          }
+          return;
         }
-        return;
-      }
-    } catch (e) {}
+      } catch (e) {}
+    }
   }
 }
 
-function createRealPhotoContainerHTML(animalKey, sizePx = 190) {
+function createRealPhotoContainerHTML(animalKey, widthPx = 420, heightPx = 300) {
   const uid = "real-photo-" + animalKey + "-" + Math.floor(Math.random() * 100000);
   setTimeout(() => loadRealWikiPhotoInto(uid, animalKey), 10);
   return `
-    <div style="width:${sizePx}px; height:${sizePx}px; border-radius:22px; border:4px solid #f59e0b; overflow:hidden; box-shadow:0 0 22px rgba(245,158,11,0.38); background:#0f172a; position:relative; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-      <img id="${uid}" alt="${animalKey}" style="width:100%; height:100%; object-fit:cover; display:none;" onerror="this.style.display='none'; document.getElementById('${uid}-fallback').style.display='flex';">
-      <div id="${uid}-fallback" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fde047; font-size:0.9rem; gap:6px;">
-        <span style="font-size:2.2rem;">📸</span>
+    <div style="width:min(92vw, ${widthPx}px); height:clamp(210px, 34dvh, ${heightPx}px); border-radius:24px; border:4px solid #f59e0b; overflow:hidden; box-shadow:0 0 26px rgba(245,158,11,0.42); background:#090d1e; position:relative; display:flex; align-items:center; justify-content:center; flex-shrink:0; padding:4px;">
+      <img id="${uid}" alt="${animalKey}" style="width:100%; height:100%; object-fit:contain; border-radius:18px; display:none;" onerror="this.style.display='none'; document.getElementById('${uid}-fallback').style.display='flex';">
+      <div id="${uid}-fallback" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fde047; font-size:1rem; gap:8px;">
+        <span style="font-size:2.6rem;">📸</span>
         <span>Cargando foto real...</span>
       </div>
     </div>
@@ -2784,7 +2787,7 @@ function startGame10() {
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
-    ${createRealPhotoContainerHTML(item.ans, 185)}
+    ${createRealPhotoContainerHTML(item.ans, 420, 290)}
     <p style="font-size:1.2rem; color:#fde047; font-weight:700; margin: 6px 0 8px; text-align:center; max-width:940px; line-height:1.35;">${clueText}</p>
     <div class="word-grid" id="read10-grid"></div>
   `;
@@ -2925,7 +2928,7 @@ function startGame11(isContinue = false) {
       </div>
     </div>
     <div style="display:flex; gap:25px; align-items:center; flex-wrap:wrap; justify-content:center; max-width:1050px; margin:auto;">
-      ${createRealPhotoContainerHTML(item.key, 270)}
+      ${createRealPhotoContainerHTML(item.key, 460, 340)}
       <div style="flex:1; min-width:300px; display:flex; flex-direction:column; gap:12px; text-align:left;">
         <h2 class="neon-title" style="font-size:2rem; color:#fde047;">${item.name}</h2>
         <p style="font-size:1.2rem; color:#e2e8f0; line-height:1.5; background:rgba(255,255,255,0.06); padding:14px; border-radius:18px; border:2px solid rgba(56,189,248,0.3);">
