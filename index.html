@@ -591,9 +591,9 @@
       Gran trabajo
     </div>
     <div style="display:flex; gap:14px; margin-top:10px; flex-wrap:wrap; justify-content:center;">
-      <button id="gameover-roulette-btn" class="btn-pill btn-roulette" style="font-size:1.2rem; padding:12px 28px; display:none;" onclick="document.getElementById('gameover-modal').classList.remove('active'); goHome(); openRouletteModal(activeRouletteMode);">🎯 Girar Ruleta (Siguiente)</button>
+      <button id="gameover-roulette-btn" class="btn-pill btn-roulette" style="font-size:1.25rem; padding:14px 28px; display:none; box-shadow:0 0 20px rgba(236,72,153,0.6);" onclick="startedFromRoulette = false; document.getElementById('gameover-modal').classList.remove('active'); goHome(); openRouletteModal(activeRouletteMode);">🎯 Girar Ruleta (Siguiente Niño/a)</button>
       <button class="btn-pill btn-scores" style="font-size:1.2rem; padding:12px 28px;" onclick="document.getElementById('gameover-modal').classList.remove('active'); confirmStartGame(60);">🔄 Jugar Otra Vez</button>
-      <button class="btn-pill btn-menu" style="font-size:1.2rem; padding:12px 28px;" onclick="document.getElementById('gameover-modal').classList.remove('active'); goHome();">🏠 Menú Principal</button>
+      <button class="btn-pill btn-menu" style="font-size:1.2rem; padding:12px 28px;" onclick="startedFromRoulette = false; document.getElementById('gameover-modal').classList.remove('active'); goHome();">🏠 Menú Principal</button>
     </div>
   </div>
 </div>
@@ -1075,6 +1075,7 @@ function executeWheelSpin() {
       requestAnimationFrame(animate);
     } else {
       activeStudent = chosenName;
+      startedFromRoulette = true;
       stats[activeStudent].turns++;
       stats[activeStudent].participated = true;
       saveCurrentStats();
@@ -1477,7 +1478,6 @@ function renderMainMenu() {
     const card = document.createElement("div");
     card.className = "menu-card";
     card.onclick = () => {
-      startedFromRoulette = false;
       if (g.id === 11) {
         pendingGameId = 11;
         confirmStartGame(0);
@@ -2687,6 +2687,114 @@ const readDeck = new Deck([
   { ans: "golondrina", opts: ["golondrina", "jilguero", "canario", "colibri"] },
   { ans: "flamenco", opts: ["flamenco", "garza", "ciguena", "cisne"] }
 ]);
+const REAL_ANIMAL_PHOTOS = {
+  ciguena: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/White_Stork_(Ciconia_ciconia)_(1).jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Ciconia_ciconia_01.jpg?width=600"
+  ],
+  cisne: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Cygnus_olor_2_(Marek_Szczepanek).jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Mute_swan_(Cygnus_olor).jpg?width=600"
+  ],
+  pavoreal: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Peacock_Plumage.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Pavo_cristatus_-displaying_train-8.jpg?width=600"
+  ],
+  colibri: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Colibri_thalassinus_-_01.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Archilochus_colubris_-flying-8.jpg?width=600"
+  ],
+  buho: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Bubo_bubo_3_(Martin_Mecnarowski).jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Eurasian_eagle-owl_(Bubo_bubo)_2.jpg?width=600"
+  ],
+  aguila: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Golden_Eagle_in_flight_-_5.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Aquila_chrysaetos_qtl1.jpg?width=600"
+  ],
+  halcon: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Falco_peregrinus_-_01.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Peregrine_falcon_in_flight.jpg?width=600"
+  ],
+  pato: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Anas_platyrhynchos_male_female_quadrat.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Mallard_drake_02.jpg?width=600"
+  ],
+  loro: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Ara_macao_-on_a_branch-8a.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Scarlet_Macaw_(Ara_macao).jpg?width=600"
+  ],
+  tucan: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Ramphastos_sulfuratus_-Belize_Zoo-6a.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Keel-billed_Toucan_(Ramphastos_sulfuratus).jpg?width=600"
+  ],
+  flamenco: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Phoenicopterus_roseus_-_01.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Greater_flamingo_(Phoenicopterus_roseus).jpg?width=600"
+  ],
+  gallina: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Gallus_gallus_domesticus_hen.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Chicken_in_grass.jpg?width=600"
+  ],
+  paloma: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Columba_livia_cropped.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Rock_Pigeon_Columba_livia.jpg?width=600"
+  ],
+  golondrina: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Barn_Swallow_(Hirundo_rustica).jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Hirundo_rustica_2.jpg?width=600"
+  ],
+  pelicano: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Pelecanus_onocrotalus_-_01.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Great_white_pelican_(Pelecanus_onocrotalus).jpg?width=600"
+  ],
+  gaviota: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Larus_michabellis_qtl1.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Yellow-legged_Gull_(Larus_michahellis).jpg?width=600"
+  ],
+  pinguino: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Emperor_Penguin_Manchot_empereur.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Aptenodytes_forsteri_-Snow_Hill_Island,_Antarctica_-adults_and_juvenile-8.jpg?width=600"
+  ],
+  murcielago: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Big-eared-townsend-fledermaus.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Corynorhinus_townsendii.jpg?width=600"
+  ],
+  canario: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Serinus_canaria_-Parque_Rural_del_Nublo,_Gran_Canaria,_Spain-8a.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Domestic_canary_(Serinus_canaria_domestica).jpg?width=600"
+  ],
+  buitre: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Gyps_fulvus_-Spain-8.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Griffon_Vulture_(Gyps_fulvus).jpg?width=600"
+  ],
+  lechuza: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Tyto_alba_-British_Wildlife_Centre,_Surrey,_England-8a_(1).jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Tyto_alba_close_up.jpg?width=600"
+  ],
+  garza: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Ardea_cinerea_Luc_Viatour.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Grey_heron_(Ardea_cinerea).jpg?width=600"
+  ],
+  cuervo: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Corvus_corax_-_01.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Common_raven_(Corvus_corax).jpg?width=600"
+  ],
+  jilguero: [
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Carduelis_carduelis_close_up.jpg?width=600",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/European_goldfinch_(Carduelis_carduelis).jpg?width=600"
+  ]
+};
+
+function getRealAnimalPhotoHTML(key) {
+  const list = REAL_ANIMAL_PHOTOS[key];
+  if (!list || list.length === 0) return getAnimalDrawing(key);
+  const p1 = list[0];
+  const p2 = list[1] || "";
+  const altName = ANIMALS[key] ? ANIMALS[key].name : key;
+  return `<img src="${p1}" referrerpolicy="no-referrer" alt="${altName}" style="width:100%; height:100%; object-fit:cover;" onerror="handleMuseumImgError(this, '${p2}', '${key}')">`;
+}
+
 function startGame10() {
   const item = readDeck.next();
   const animalObj = ANIMALS[item.ans];
@@ -2694,17 +2802,18 @@ function startGame10() {
   let locked = false;
   box.innerHTML = `
     <div class="stage-header">
-      <div class="stage-title neon-title">📖 10. Asociación Lectora</div>
+      <div class="stage-title neon-title">📖 10. Asociación Foto Real y Palabra</div>
       <div style="display:flex; gap:8px;">
+        <button class="btn-pill btn-scores" onclick="speakSequential('${animalObj.clue.replace(/'/g, "")}')">🔊 Escuchar</button>
         <button class="btn-pill btn-pause" onclick="togglePause()">⏸️ Pausa</button>
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
-    <div class="drawing-frame" style="width:160px; height:160px;">${getAnimalDrawing(item.ans)}</div>
-    <p style="font-size:1.1rem; color:#fde047; font-weight:700; margin: 4px 0 6px; text-align:center;">${animalObj.clue}</p>
+    <div class="drawing-frame" style="width:185px; height:185px; border-width:4px; border-color:#f59e0b; box-shadow:0 0 20px rgba(245,158,11,0.35);">${getRealAnimalPhotoHTML(item.ans)}</div>
+    <p style="font-size:1.15rem; color:#fde047; font-weight:700; margin: 4px 0 6px; text-align:center; max-width:920px;">${animalObj.clue}</p>
     <div class="word-grid" id="read10-grid"></div>
   `;
-  speakSequential("Observa el dibujo y toca la palabra correcta.");
+  speakSequential(`${animalObj.clue}. Toca su palabra.`);
 
   const grid = document.getElementById("read10-grid");
   [...item.opts].sort(() => Math.random() - 0.5).forEach(k => {
@@ -2715,11 +2824,14 @@ function startGame10() {
       if (locked) return;
       if (k === item.ans) {
         locked = true; recordResult(true); soundBell();
-        speakSequential(`¡Excelente! Has leído ${w}`, () => {
+        speakSequential(`¡Muy bien! ${w}`, () => {
           if (document.getElementById("read10-grid")) startGame10();
         });
       } else {
-        recordResult(false); btn.classList.add("wrong"); setTimeout(() => btn.classList.remove("wrong"), 450);
+        recordResult(false);
+        btn.classList.add("wrong");
+        speakSequential(retryMessagesDeck.next());
+        setTimeout(() => btn.classList.remove("wrong"), 450);
       }
     };
     grid.appendChild(btn);
