@@ -334,7 +334,7 @@
   .animal-card.correct { border-color: #10b981; background: rgba(16, 185, 129, 0.35); transform: scale(1.04); }
 
   .drawing-frame {
-    width: 145px; height: 145px;
+    width: 185px; height: 185px;
     border-radius: 20px;
     border: 3px solid #38bdf8;
     overflow: hidden;
@@ -2380,7 +2380,7 @@ function startGame5() {
     </div>
     <p style="font-size:1.25rem; color:#fde047; margin-bottom:8px;">¡Fíjate en el orden! ¿Qué ave continúa la serie?</p>
     <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center; margin-bottom:12px;">
-      ${item.seq.map(k => `<div class="drawing-frame" style="width:105px; height:105px;">${getAnimalDrawing(k)}</div>`).join("")}
+      ${item.seq.map(k => `<div class="drawing-frame" style="width:115px; height:115px;">${createRealCardThumbHTML(k)}</div>`).join("")}
       <div class="syl-slot">❓</div>
     </div>
     <div class="cards-row" id="series-opts"></div>
@@ -2391,7 +2391,7 @@ function startGame5() {
   [...item.opts].sort(() => Math.random() - 0.5).forEach(k => {
     const c = document.createElement("div");
     c.className = "animal-card";
-    c.innerHTML = `<div class="drawing-frame" style="width:120px; height:120px;">${getAnimalDrawing(k)}</div><div class="animal-name">${ANIMALS[k].name}</div>`;
+    c.innerHTML = `<div class="drawing-frame" style="width:140px; height:140px;">${createRealCardThumbHTML(k)}</div><div class="animal-name">${ANIMALS[k].name}</div>`;
     c.onclick = () => {
       if (k === item.ans) {
         c.classList.add("correct"); recordResult(true); soundBell();
@@ -2449,7 +2449,7 @@ function startGame6() {
   pool.forEach(k => {
     const c = document.createElement("div");
     c.className = "animal-card";
-    c.innerHTML = `<div class="drawing-frame" style="width:105px; height:105px;">${getAnimalDrawing(k)}</div><div class="animal-name" style="font-size:1.05rem;">${ANIMALS[k].name}</div>`;
+    c.innerHTML = `<div class="drawing-frame" style="width:120px; height:120px;">${createRealCardThumbHTML(k)}</div><div class="animal-name" style="font-size:1.05rem;">${ANIMALS[k].name}</div>`;
     c.onclick = () => {
       if (k === mission.target) {
         c.style.visibility = "hidden"; rem--; recordResult(true); playRouletteTick(920);
@@ -2503,7 +2503,7 @@ function startGame7() {
   item.opts.forEach(k => {
     const card = document.createElement("div");
     card.className = "animal-card";
-    card.innerHTML = `<div class="drawing-frame">${getAnimalDrawing(k)}</div><div class="animal-name">${ANIMALS[k].name}</div>`;
+    card.innerHTML = `<div class="drawing-frame">${createRealCardThumbHTML(k)}</div><div class="animal-name">${ANIMALS[k].name}</div>`;
     card.onclick = () => {
       if (answered) return;
       if (k === item.ans) {
@@ -2564,7 +2564,7 @@ function startGame8() {
   item.opts.forEach(k => {
     const card = document.createElement("div");
     card.className = "animal-card";
-    card.innerHTML = `<div class="drawing-frame">${getAnimalDrawing(k)}</div><div class="animal-name">${ANIMALS[k].name}</div>`;
+    card.innerHTML = `<div class="drawing-frame">${createRealCardThumbHTML(k)}</div><div class="animal-name">${ANIMALS[k].name}</div>`;
     card.onclick = () => {
       if (solved) return;
       if (k === item.ans) {
@@ -2621,7 +2621,7 @@ function startGame9() {
         <button class="btn-pill btn-menu" onclick="goHome()">🏠 Menú</button>
       </div>
     </div>
-    <div class="drawing-frame" style="width:145px; height:145px;">${getAnimalDrawing(item.key)}</div>
+    <div class="drawing-frame" style="width:190px; height:190px;">${createRealCardThumbHTML(item.key)}</div>
     <p style="color:#93c5fd; font-weight:700; margin-top:2px; text-align:center;">${ANIMALS[item.key].clue}</p>
     <div class="slots-wrap" id="syl-slots">${item.syls.map(() => `<div class="syl-slot">_</div>`).join("")}</div>
     <div class="syls-wrap" id="syl-tiles"></div>
@@ -2711,7 +2711,15 @@ const WIKI_ARTICLE_TITLES = {
   lechuza: ["Tyto alba", "Barn owl"],
   garza: ["Ardea cinerea", "Grey heron"],
   cuervo: ["Corvus corax", "Common raven"],
-  jilguero: ["Carduelis carduelis", "European goldfinch"]
+  jilguero: ["Carduelis carduelis", "European goldfinch"],
+  perro: ["Canis familiaris", "Dog"],
+  gato: ["Felis silvestris catus", "Cat"],
+  caballo: ["Equus ferus caballus", "Horse"],
+  conejo: ["Oryctolagus cuniculus", "European rabbit"],
+  tortuga: ["Testudines", "Turtle"],
+  mariposa: ["Danaus plexippus", "Butterfly"],
+  abeja: ["Apis mellifera", "Western honey bee"],
+  avestruz: ["Struthio camelus", "Common ostrich"]
 };
 
 const WIKI_PHOTO_CACHE = {};
@@ -2755,6 +2763,17 @@ async function loadRealWikiPhotoInto(imgId, animalKey) {
       } catch (e) {}
     }
   }
+}
+
+function createRealCardThumbHTML(animalKey) {
+  const uid = "real-card-" + animalKey + "-" + Math.floor(Math.random() * 1000000);
+  setTimeout(() => loadRealWikiPhotoInto(uid, animalKey), 10);
+  return `
+    <img id="${uid}" alt="${animalKey}" style="width:100%; height:100%; object-fit:cover; display:none;" onerror="this.style.display='none'; document.getElementById('${uid}-fallback').style.display='flex';">
+    <div id="${uid}-fallback" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+      ${getAnimalDrawing(animalKey)}
+    </div>
+  `;
 }
 
 function createRealPhotoContainerHTML(animalKey, widthPx = 420, heightPx = 300) {
